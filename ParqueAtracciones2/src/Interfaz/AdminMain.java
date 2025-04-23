@@ -1,5 +1,8 @@
 package Interfaz;
 
 public class AdminMain {
-	hola
+    public static void main(String[] args) {
+        InterfazAdmin interfaz = new InterfazAdmin();
+        interfaz.iniciar();
+    }
 }
