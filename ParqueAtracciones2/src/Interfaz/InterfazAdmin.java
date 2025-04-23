@@ -87,8 +87,49 @@ public class InterfazAdmin {
             archivoPlano.escribir("datos/atracciones.csv", atraccionesRegistradas);
 
         } else if (opcion == 2) {
-            System.out.println("⚠️ Registro de atracción cultural aún no implementado.");
-        } else {
+            System.out.println("== Registro Atracción Cultural ==");
+
+            System.out.print("Nombre: ");
+            String nombre = scanner.nextLine();
+            // Verificar si ya existe en el archivo
+            archivoPlano = new ArchivoPlano();
+            ArrayList<String> existentes = archivoPlano.leer("datos/atracciones.csv");
+            for (String linea : existentes) {
+                if (linea.startsWith(nombre + ",")) {
+                    System.out.println("Ya existe esa atraccion.");
+                    return;
+                }
+            }
+            System.out.print("Cupo máximo: ");
+            int cupoMaximo = scanner.nextInt();
+
+            System.out.print("Cantidad de empleados encargados: ");
+            int empleadosEncargados = scanner.nextInt();
+
+            System.out.print("¿Está disponible con clima adverso? (true/false): ");
+            boolean disponibleClima = scanner.nextBoolean();
+            scanner.nextLine(); // limpiar salto
+
+            System.out.print("Nivel de exclusividad (oro/plata/etc): ");
+            String nivelExclusividad = scanner.nextLine();
+
+            System.out.print("Edad mínima requerida para ingresar: ");
+            int edadMinima = scanner.nextInt();
+            scanner.nextLine();
+
+            this.atraccionCultural = new AtraccionCultural(
+                nombre, cupoMaximo, empleadosEncargados, disponibleClima,
+                nivelExclusividad, edadMinima
+            );
+
+            // Guardar en archivo
+            ArrayList<String> lineas = new ArrayList<>();
+            lineas.add(atraccionCultural.toString());
+            archivoPlano.escribir("datos/atracciones.csv", lineas);
+
+            System.out.println(" Atracción cultural creada con éxito: " + nombre);
+        }
+        else {
             System.out.println("Opción inválida.");
         }
     }
