@@ -8,11 +8,11 @@ public class InterfazEmpleado {
     public void iniciar() {
         while (true) {
             System.out.println("=== MENÚ EMPLEADO ===");
-            System.out.println("1. Validar ingreso a atracción");
+            System.out.println("1. Validar ingreso a atraccion");
             System.out.println("2. Marcar asistencia de cliente");
             System.out.println("3. Ver historial de cliente");
             System.out.println("0. Salir");
-            System.out.print("Elija una opción: ");
+            System.out.print("Elija una opcion: ");
             int opcion = scanner.nextInt();
             scanner.nextLine();
 
@@ -20,7 +20,7 @@ public class InterfazEmpleado {
             else if (opcion == 2) marcarAsistencia();
             else if (opcion == 3) verHistorial();
             else if (opcion == 0) break;
-            else System.out.println("Opción inválida.");
+            else System.out.println("Opcion invalida.");
         }
     }
 

@@ -10,9 +10,9 @@ public class InterfazCliente {
             System.out.println("=== MENÚ CLIENTE ===");
             System.out.println("1. Registrarse");
             System.out.println("2. Consultar atracciones");
-            System.out.println("3. Acceder a una atracción");
+            System.out.println("3. Acceder a una atraccion");
             System.out.println("0. Salir");
-            System.out.print("Elija una opción: ");
+            System.out.print("Elija una opcion: ");
             int opcion = scanner.nextInt();
             scanner.nextLine();
 
@@ -20,7 +20,7 @@ public class InterfazCliente {
             else if (opcion == 2) consultarAtracciones();
             else if (opcion == 3) accederAtraccion();
             else if (opcion == 0) break;
-            else System.out.println("Opción inválida.");
+            else System.out.println("Opcion invalida.");
         }
     }
 

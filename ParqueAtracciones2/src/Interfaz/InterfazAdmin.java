@@ -8,11 +8,11 @@ public class InterfazAdmin {
     public void iniciar() {
         while (true) {
             System.out.println("=== MENÚ ADMINISTRADOR ===");
-            System.out.println("1. Crear atracción");
-            System.out.println("2. Modificar atracción");
-            System.out.println("3. Eliminar atracción");
+            System.out.println("1. Crear atraccion");
+            System.out.println("2. Modificar atraccion");
+            System.out.println("3. Eliminar atraccion");
             System.out.println("0. Salir");
-            System.out.print("Elija una opción: ");
+            System.out.print("Elija una opcion: ");
             int opcion = scanner.nextInt();
             scanner.nextLine();
 
@@ -20,19 +20,19 @@ public class InterfazAdmin {
             else if (opcion == 2) modificarAtraccion();
             else if (opcion == 3) eliminarAtraccion();
             else if (opcion == 0) break;
-            else System.out.println("Opción inválida.");
+            else System.out.println("Opcion invalida.");
         }
     }
 
     private void crearAtraccion() {
-        System.out.println("Creando atracción...");
+        System.out.println("Creando atraccion...");
     }
 
     private void modificarAtraccion() {
-        System.out.println("Modificando atracción...");
+        System.out.println("Modificando atraccion...");
     }
 
     private void eliminarAtraccion() {
-        System.out.println("Eliminando atracción...");
+        System.out.println("Eliminando atraccion...");
     }
 }
