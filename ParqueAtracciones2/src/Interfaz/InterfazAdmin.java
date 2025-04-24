@@ -285,16 +285,25 @@ public class InterfazAdmin {
      * FUNCION PARA MODIFICAR LA INFORMACION DE UNA ATRACCION EN ESPECIFICO
      */
 	private void modificarAtraccion() {
-	    System.out.println("== Modificar atracción ==");
+		System.out.println("== Modificar atracción ==");
 
-	    System.out.print("Ingrese el nombre de la atracción a modificar: ");
-	    String nombreModificar = scanner.nextLine();
+		archivoPlano = new ArchivoPlano();
+		ArrayList<String> atraccionesActuales = archivoPlano.leer("datos/atracciones.csv");
 
-	    archivoPlano = new ArchivoPlano();
-	    ArrayList<String> atraccionesActuales = archivoPlano.leer("datos/atracciones.csv");
+		// Muestra el nombre de todas las atracciones para mayor facilidad
+		System.out.println("\nAtracciones actuales:");
+		for (String linea : atraccionesActuales) {
+		    String[] partes = linea.split(",");
+		    if (partes.length > 1) {
+		        System.out.println("- " + partes[1]);
+		    }
+		}
 
-	    boolean encontrada = false;
-	    ArrayList<String> atraccionesModificadas = new ArrayList<>();
+		System.out.print("\nIngrese el nombre de la atracción a modificar: ");
+		String nombreModificar = scanner.nextLine();
+
+		boolean encontrada = false;
+		ArrayList<String> atraccionesModificadas = new ArrayList<>();
 
 	    for (String linea : atraccionesActuales) {
 	        String[] partes = linea.split(",");
