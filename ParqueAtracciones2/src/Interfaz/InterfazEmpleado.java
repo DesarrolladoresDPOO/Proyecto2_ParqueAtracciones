@@ -193,13 +193,13 @@ public class InterfazEmpleado {
             br.close();
 
             if (nombreCliente == null) {
-                System.out.println("❌ Cliente no encontrado.");
+                System.out.println("Cliente no encontrado.");
                 return;
             }
 
             File archivo = new File("datos/asistencias_clientes.csv");
             if (!archivo.exists()) {
-                System.out.println("📭 No hay historial de asistencias aún.");
+                System.out.println("No hay historial de asistencias aun.");
                 return;
             }
 
