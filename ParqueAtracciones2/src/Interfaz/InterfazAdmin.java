@@ -18,6 +18,48 @@ public class InterfazAdmin {
 	
 	// Objeto para lectura de archivos
     private ArchivoPlano archivoPlano;
+    
+    /**
+	 * VERIFICACION DE LA INFORMACION DEL ADMINISTRADOR
+	 */
+    
+    public void autenticarYIniciar() {
+        System.out.println("== AUTENTICACION DE ADMINISTRADOR ==");
+
+        System.out.print("Usuario (admin1): ");
+        String usuarioIngresado = scanner.nextLine();
+
+        System.out.print("Contraseña (adminpass): ");
+        String contraseñaIngresada = scanner.nextLine();
+
+        archivoPlano = new ArchivoPlano();
+        ArrayList<String> empleados = archivoPlano.leer("datos/empleados.csv");
+
+        boolean autenticado = false;
+
+        for (String linea : empleados) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 3) {
+                String rol = partes[0];
+                String usuario = partes[1];
+                String contraseña = partes[2];
+
+                if (rol.equalsIgnoreCase("Administrador") &&
+                    usuario.equals(usuarioIngresado) &&
+                    contraseña.equals(contraseñaIngresada)) {
+                    autenticado = true;
+                    break;
+                }
+            }
+        }
+
+        if (autenticado) {
+            System.out.println("Autenticacion exitosa");
+            iniciar(); // Aquí llamas a tu método iniciar()
+        } else {
+            System.out.println("Usuario o contraseña incorrectos. Acceso denegado.");
+        }
+    }
 
 	public void iniciar() {
 		
