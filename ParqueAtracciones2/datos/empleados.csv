@@ -1,6 +1,6 @@
 Administrador,admin1,adminpass,Ana Torres,1001,Dirección,Diurno (2025-04-02T08:00 - 2025-04-02T16:00)
-Cajero,cajero1,pass123,Luis Perez,1002,Taquilla,Diurno (2025-04-02T08:00 - 2025-04-02T16:00)
+Cajero,cajero1,pass123,Luis Perez,1002,Taquilla,Diurno (2025-05-01T08:00 - 2025-05-01T15:00)
 Cocinero,cocinero1,chefpass,Laura Gomez,1003,Cocina,Diurno (2025-04-02T08:00 - 2025-04-02T16:00)
 OperadorMecanico,opmec1,mecanico123,Juan Ruiz,1004,MontanaRusa,Diurno (2025-04-02T08:00 - 2025-04-02T16:00)
 ServicioGeneral,limpia1,servpass,Sandra Diaz,1005,Baños,Diurno (2025-04-02T08:00 - 2025-04-02T16:00)
-Cocinero,Jero123,pass8,Jeronimo Lopez,1,Cocina,Diurno (2025-04-02T08:00 - 2025-04-02T16:00)
+Cocinero,Jero123,pass8,Jeronimo Lopez,1,Cocina,Nocturno (2025-05-01T15:00 - 2025-05-01T23:00)

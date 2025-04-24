@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import atracciones.AtraccionMecanica;
 import atracciones.Atraccion;
 import atracciones.AtraccionCultural;
 
 import persistencia.ArchivoPlano;
+import persona.Turno;
 
 public class InterfazAdmin {
 	private Scanner scanner = new Scanner(System.in);
 	private AtraccionMecanica atraccionMecanica;
 	private AtraccionCultural atraccionCultural;
 	private List<Atraccion> atracciones;
+	private List<Turno> turnosDisponibles = new ArrayList<>();
 	
 	// Objeto para lectura de archivos
     private ArchivoPlano archivoPlano;
@@ -156,6 +161,8 @@ public class InterfazAdmin {
 			if (opcion == 1) crearAtraccion();
 			else if (opcion == 2) modificarAtraccion();
 			else if (opcion == 3) eliminarAtraccion();
+			else if (opcion == 4) crearTurno();
+			else if (opcion == 5) AsignarNuevoTurno();
 			else if (opcion == 0) break;
 			else System.out.println("Opcion invalida.");
 		}
@@ -418,5 +425,103 @@ public class InterfazAdmin {
 	    } else {
 	        System.out.println("No se encontró una atracción con ese nombre.");
 	    }
+	}
+	/**
+     * FUNCION QUE PERMITE CREAR UN TURNO
+     */
+	private void crearTurno() {
+	    System.out.println("\n== Crear nuevo turno ==");
+
+	    System.out.print("Ingrese el tipo de turno (Diurno o Nocturno): ");
+	    String tipo = scanner.nextLine();
+
+	    System.out.println("Ingrese la fecha y hora de inicio del turno (formato: yyyy-MM-dd HH:mm): ");
+	    String inicioStr = scanner.nextLine();
+
+	    System.out.println("Ingrese la fecha y hora de fin del turno (formato: yyyy-MM-dd HH:mm): ");
+	    String finStr = scanner.nextLine();
+
+	    try {
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+	        LocalDateTime inicio = LocalDateTime.parse(inicioStr, formatter);
+	        LocalDateTime fin = LocalDateTime.parse(finStr, formatter);
+
+	        Turno nuevoTurno = new Turno(tipo, inicio, fin);
+	        turnosDisponibles.add(nuevoTurno);
+	        
+	        System.out.println("Turno creado exitosamente:");
+	        System.out.println(nuevoTurno);
+	        System.out.println("Desea añadir un turno a un empleado? (s/n)");
+	        String op=scanner.nextLine();
+	        if (op.equalsIgnoreCase("s")) {
+	            AsignarNuevoTurno();
+	        }
+
+	    // Usamos una excepcion por si se ingresa incorrectamente la fecha, si no se hace se produciria error
+	    } catch (Exception e) {
+	        System.out.println("Error al crear el turno. Asegúrese de ingresar los datos en el formato correcto.");
+	    }
+	}
+	/**
+     * FUNCION QUE PERMITE ASIGNAR UN TURNO A UN EMPLEADO DADO
+     */
+	private void AsignarNuevoTurno() {
+	    System.out.println("\n== Asignar nuevo turno a un empleado ==");
+	    
+	    // Leemos y mostramos los empleados actuales
+	    ArchivoPlano archivoPlano = new ArchivoPlano();
+	    ArrayList<String> empleadosActuales = archivoPlano.leer("datos/empleados.csv");
+
+	    System.out.println("Lista de empleados:");
+	    for (int i = 0; i < empleadosActuales.size(); i++) {
+	        String[] partes = empleadosActuales.get(i).split(",");
+	        if (partes.length >= 4) {
+	            System.out.println((i + 1) + ". " + partes[3] + " (ID: " + partes[4] + ")");
+	        }
+	    }
+
+	    System.out.print("Seleccione el número del empleado al que desea asignar un nuevo turno: ");
+	    int opcionEmpleado = Integer.parseInt(scanner.nextLine()) - 1;
+
+	    if (opcionEmpleado < 0 || opcionEmpleado >= empleadosActuales.size()) {
+	        System.out.println("Empleado no válido.");
+	        return;
+	    }
+
+	    // Mostramos los turnos previamente creados en el metodo crearTurno
+	    if (turnosDisponibles.isEmpty()) {
+	        System.out.println("No hay turnos disponibles. Por favor cree uno primero.");
+	        return;
+	    }
+
+	    System.out.println("\nTurnos disponibles:");
+	    for (int i = 0; i < turnosDisponibles.size(); i++) {
+	        System.out.println((i + 1) + ". " + turnosDisponibles.get(i));
+	    }
+
+	    System.out.print("Seleccione el número del turno que desea asignar: ");
+	    int opcionTurno = Integer.parseInt(scanner.nextLine()) - 1;
+
+	    if (opcionTurno < 0 || opcionTurno >= turnosDisponibles.size()) {
+	        System.out.println("Turno no válido.");
+	        return;
+	    }
+
+	    Turno turnoSeleccionado = turnosDisponibles.get(opcionTurno);
+
+	    // Actualizamos la informacion del csv con el nuevo turno y guardamos el CSV
+	    String lineaOriginal = empleadosActuales.get(opcionEmpleado);
+	    String[] partes = lineaOriginal.split(",");
+	    if (partes.length < 7) {
+	        System.out.println("Error al procesar el empleado.");
+	        return;
+	    }
+
+	    partes[6] = turnoSeleccionado.toString();
+	    String nuevaLinea = String.join(",", partes);
+	    empleadosActuales.set(opcionEmpleado, nuevaLinea);
+
+	    archivoPlano.escribir("datos/empleados.csv", empleadosActuales);
+	    System.out.println("Turno asignado exitosamente a " + partes[3]);
 	}
 }
