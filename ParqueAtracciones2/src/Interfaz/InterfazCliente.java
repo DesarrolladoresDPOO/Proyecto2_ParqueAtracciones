@@ -1,219 +1,230 @@
 package Interfaz;
 
 import java.util.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import persistencia.ArchivoPlano;
-import persona.*;
-import tiquetes.*;
+
+import atracciones.Atraccion;
 import tiquetes.Cliente;
+import tiquetes.Tiquete;
+import tiquetes.TiqueteBasico;
+import tiquetes.TiqueteDiamante;
+import tiquetes.TiqueteFamiliar;
+import tiquetes.TiqueteOro;
+
+import java.io.*;
 
 public class InterfazCliente {
-
-    private Scanner scanner = new Scanner(System.in);    
-    private ArchivoPlano archivoPlano = new ArchivoPlano();
     private List<Cliente> clientes;
-    private List<Empleado> empleados; // Nueva lista para empleados
 
-    public InterfazCliente(List<Cliente> clientes) {
-        this.clientes = clientes;
-        this.empleados = cargarEmpleadosDesdeCSV(); // Cargamos empleados al iniciar
-    }
-
-    // Método para cargar empleados desde CSV
-    private List<Empleado> cargarEmpleadosDesdeCSV() {
-        List<Empleado> empleados = new ArrayList<>();
-        List<String> lineasEmpleados = archivoPlano.leer("datos/empleados.csv");
-        
-        for (String linea : lineasEmpleados) {
-            String[] datos = linea.split(",");
-            String tipo = datos[0];
-            String login = datos[1];
-            String password = datos[2];
-            String nombre = datos[3];
-            int id = Integer.parseInt(datos[4]);
-            String departamento = datos[5];
-            
-            // Crear LocalDateTime para el turno (usamos fecha actual como base)
-            LocalDateTime fechaBase = LocalDateTime.now();
-            Turno turno;
-            
-            if (datos[6].equals("Diurno")) {
-                turno = new Turno("Diurno", 
-                    fechaBase.withHour(8).withMinute(0),  // 8:00 AM
-                    fechaBase.withHour(16).withMinute(0)); // 4:00 PM
-            } else {
-                turno = new Turno("Nocturno", 
-                    fechaBase.withHour(16).withMinute(0),   // 4:00 PM
-                    fechaBase.withHour(24).withMinute(0));  // 12:00 AM
-            }
-
-            switch (tipo) {
-                case "Cajero":
-                    Cajero cajero = new Cajero(login, password, nombre, id, departamento, turno, true);
-                    empleados.add(cajero);
-                    break;
-                // ... otros casos de empleados
-            }
-        }
-        return empleados;
+    public InterfazCliente() {
+        this.clientes = leerClientesDesdeCSV("datos/clientes.csv");
     }
 
     public void iniciar() {
+        Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("=== MENU CLIENTE ===");
-            System.out.println("1. Registrarse");
-            System.out.println("2. Comprar tiquete");
-            System.out.println("3. Consultar tiquetes");
+            System.out.println("\n=== MENU CLIENTE ===");
+            System.out.println("1. Comprar tiquete");
+            System.out.println("2. Consultar tiquetes de un cliente");
+            System.out.println("3. Registrar un nuevo cliente");
             System.out.println("0. Salir");
-            System.out.print("Opción: ");
-            int opcion = scanner.nextInt();
-            scanner.nextLine();
+            System.out.print("Seleccione una opción: ");
+            String opcion = scanner.nextLine();
 
             switch (opcion) {
-                case 1 -> registrarCliente();
-                case 2 -> comprarTiquete();
-                case 3 -> consultarTiquetes();
-                case 0 -> { return; }
-                default -> System.out.println("Opción inválida.");
+                case "1":
+                    comprarTiquete();
+                    break;
+                case "2":
+                    consultarTiquetesCliente();
+                    break;
+                case "3":
+                	registrarseComoCliente();
+                    break;
+                case "0":
+                    escribirClientesEnCSV("datos/clientes.csv");
+                    return;
+                default:
+                    System.out.println("Opción inválida.");
             }
         }
     }
-
-    private void registrarCliente() {
-        System.out.print("Ingrese nombre: ");
-        String nombre = scanner.nextLine();
-        System.out.print("Ingrese su Login: ");
-        String login = scanner.nextLine();
-        System.out.print("Ingrese su Contraseña: ");
-        String password = scanner.nextLine();
+    
+    /**
+	 * REGISTRO DE UN NUEVO CLIENTE
+	 */
+    public void registrarseComoCliente() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingrese el nombre del nuevo cliente:");
+        String nombreCliente = scanner.nextLine();
 
         for (Cliente c : clientes) {
-            if (c.getNombre().equalsIgnoreCase(nombre)) {
-                System.out.println("Ese cliente ya esta registrado.");
+            if (c.getNombre().equalsIgnoreCase(nombreCliente)) {
+                System.out.println("Ya existe un cliente con ese nombre.");
                 return;
             }
         }
 
-        Cliente nuevo = new Cliente(login, password, nombre, new ArrayList<>());
-        clientes.add(nuevo);
-        System.out.println("Cliente registrado exitosamente.");
+        System.out.println("Ingrese login:");
+        String login = scanner.nextLine();
+
+        System.out.println("Ingrese contraseña:");
+        String password = scanner.nextLine();
+
+        Cliente nuevoCliente = new Cliente(login, password, nombreCliente, new ArrayList<>());
+        clientes.add(nuevoCliente);
+        escribirClientesEnCSV("datos/clientes.csv");
+
+        System.out.println("Cliente registrado exitosamente sin comprar un tiquete.");
     }
-
-
+    
+    /**
+	 * COMPRAR UN TIQUETE PARA UN CLIENTE, SI ESTE NO EXISTE SE REGISTRA
+	 */
     private void comprarTiquete() {
-        System.out.print("Nombre del cliente: ");
-        String nombre = scanner.nextLine();
-        Cliente cliente = buscarCliente(nombre);
-        if (cliente == null) {
-            System.out.println("Cliente no encontrado.");
-            return;
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<Tiquete> tiqueteCliente = new ArrayList<>();
+        System.out.println("Ingrese el nombre del cliente que desea comprar un tiquete:");
+        String nombreCliente = scanner.nextLine();
+
+        Cliente clienteEncontrado = null;
+        for (Cliente c : clientes) {
+            if (c.getNombre().equalsIgnoreCase(nombreCliente)) {
+                clienteEncontrado = c;
+                break;
+            }
         }
 
-        System.out.print("¿Desea FastPass? (s/n): ");
+        if (clienteEncontrado == null) {
+            System.out.println("Cliente no encontrado. ¿Desea registrarlo? (s/n)");
+            String respuesta = scanner.nextLine();
+            if (respuesta.equalsIgnoreCase("s")) {
+                System.out.println("Ingrese login:");
+                String login = scanner.nextLine();
+                System.out.println("Ingrese contraseña:");
+                String password = scanner.nextLine();
+                clienteEncontrado = new Cliente(login, password, nombreCliente, tiqueteCliente);
+                clientes.add(clienteEncontrado);
+                System.out.println("Cliente registrado exitosamente.");
+            } else {
+                System.out.println("Venta cancelada.");
+                return;
+            }
+        }
+
+        System.out.println("¿Desea agregar FastPass? (s/n)");
         boolean fastPass = scanner.nextLine().equalsIgnoreCase("s");
 
-        System.out.println("Seleccione el tipo de compra:");
-        System.out.println("1. Compra Virtual");
-        System.out.println("2. Compra en Taquilla");
-        int tipoCompra = scanner.nextInt();
-        scanner.nextLine(); 
+        System.out.println("Seleccione el tipo de tiquete a comprar:");
+        System.out.println("1. Básico");
+        System.out.println("2. Familiar");
+        System.out.println("3. Oro");
+        System.out.println("4. Diamante");
+        int tipo = Integer.parseInt(scanner.nextLine());
 
-        System.out.println("Seleccione el tipo de tiquete:");
-        System.out.println("1. Básico\n2. Familiar\n3. Oro\n4. Diamante\n5. Entrada Individual");
-        int tipo = scanner.nextInt();
-        scanner.nextLine();
-
-        Tiquete nuevo = switch (tipo) {
-            case 1 -> new TiqueteBasico(fastPass);
-            case 2 -> new TiqueteFamiliar(new ArrayList<>(), fastPass);
-            case 3 -> new TiqueteOro(new ArrayList<>(), fastPass);
-            case 4 -> new TiqueteDiamante(new ArrayList<>(), fastPass);
-            case 5 -> {
-                System.out.print("Ingrese el nombre de la atracción: ");
-                String nombreAtraccion = scanner.nextLine();
-                yield new EntradaIndividual(nombreAtraccion, fastPass);
-            }
-            default -> null;
-        };
-
-        if (nuevo == null) {
+        List<Atraccion> atraccionesVacias = new ArrayList<>(); // Simulación
+        Tiquete nuevo;
+        if (tipo == 1) {
+            nuevo = new TiqueteBasico(fastPass);
+        } else if (tipo == 2) {
+            nuevo = new TiqueteFamiliar(atraccionesVacias, fastPass);
+        } else if (tipo == 3) {
+            nuevo = new TiqueteOro(atraccionesVacias, fastPass);
+        } else if (tipo == 4) {
+            nuevo = new TiqueteDiamante(atraccionesVacias, fastPass);
+        } else {
             System.out.println("Tipo de tiquete inválido.");
             return;
         }
 
-        if (tipoCompra == 1) {
-            // Venta online
-            System.out.print("Método de pago (ej. tarjeta, PayPal): ");
-            String metodoPago = scanner.nextLine();
-            VentaOnline ventaOnline = new VentaOnline(cliente, metodoPago, new Date(), 0);
-            if (ventaOnline.procesarPago()) {
-                cliente.comprarTiquete(nuevo);
-                System.out.println(ventaOnline.generarFactura());
-                ventaOnline.enviarConfirmacion();
-            } else {
-                System.out.println("Error en el procesamiento de pago.");
-            }
-        } else if (tipoCompra == 2) {
-            // Compra en taquilla
-            System.out.println("Cajeros disponibles:");
-            for (Empleado emp : empleados) {
-                if (emp instanceof Cajero) {
-                    System.out.println("- ID: " + emp.getId() + " | Nombre: " + emp.getNombre());
-                }
-            }
-            
-            System.out.print("Ingrese el ID del cajero: ");
-            int idCajero = scanner.nextInt();
-            scanner.nextLine();
-            
-            Cajero cajero = null;
-            for (Empleado empleado : empleados) {
-                if (empleado instanceof Cajero && empleado.getId() == idCajero) {
-                    cajero = (Cajero) empleado;
-                    break;
-                }
-            }
-            
-            if (cajero == null) {
-                System.out.println("Cajero no válido.");
-                return;
-            }
-            
-            Taquilla taquilla = new Taquilla(new ArrayList<>());
-            taquilla.asignarCajero(cajero);
-            taquilla.registrarVenta(nuevo.getTipo(), 0);  
-            cliente.comprarTiquete(nuevo);
-            System.out.println("Compra realizada en taquilla con el cajero: " + cajero.getNombre());
-        } else {
-            System.out.println("Opción inválida para tipo de compra.");
-        }
-    }
-    private void consultarTiquetes() {
-        System.out.print("Nombre del cliente: ");
-        String nombre = scanner.nextLine();
-        Cliente cliente = buscarCliente(nombre);
-        if (cliente == null) {
-            System.out.println("Cliente no encontrado.");
-            return;
-        }
+        clienteEncontrado.getTiquetes().add(nuevo);
+        System.out.println("Tiquete agregado exitosamente al cliente " + clienteEncontrado.getNombre());
 
-        List<Tiquete> tiquetes = cliente.getTiquetes();
-        if (tiquetes.isEmpty()) {
-            System.out.println("No tiene tiquetes.");
-        } else {
-            for (Tiquete t : tiquetes) {
-                System.out.println("- " + t.getTipo() + " | FastPass: " + t.hasFastPass() + " | Usado: " + t.isUsado());
-            }
-        }
+        escribirClientesEnCSV("datos/clientes.csv");
     }
 
-    private Cliente buscarCliente(String nombre) {
+    /**
+	 * CONSULTA LOS TIQUETES DE UN CLIENTE DADO
+	 */
+    private void consultarTiquetesCliente() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingrese el nombre del cliente:");
+        String nombreCliente = scanner.nextLine();
+        boolean encontrado = false;
+
         for (Cliente c : clientes) {
-            if (c.getNombre().equalsIgnoreCase(nombre)) {
-                return c;
+            if (c.getNombre().equalsIgnoreCase(nombreCliente)) {
+                encontrado = true;
+                List<Tiquete> listaTiq = c.getTiquetes();
+                if (listaTiq.isEmpty()) {
+                    System.out.println("Este cliente no tiene tiquetes.");
+                } else {
+                    System.out.println("Tiquetes de " + c.getNombre() + ":");
+                    for (Tiquete t : listaTiq) {
+                        System.out.println("- Tipo: " + t.getTipo() + ", Usado: " + (t.isUsado() ? "Sí" : "No"));
+                    }
+                }
+                break;
             }
         }
-        return null;
+
+        if (!encontrado) {
+            System.out.println("Cliente no encontrado.");
+        }
+    }
+
+    /**
+	 * METODOS LECTURA Y ESCRITURA CLIENTES
+	 */
+    private List<Cliente> leerClientesDesdeCSV(String ruta) {
+        List<Cliente> lista = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                if (partes.length >= 4) {
+                    String login = partes[0];
+                    String password = partes[1];
+                    String nombre = partes[2];
+                    String[] tiposTiquetes = partes[3].split(";");
+                    ArrayList<Tiquete> tiquetes = new ArrayList<>();
+                    for (String tipo : tiposTiquetes) {
+                        if (tipo.equalsIgnoreCase("Basico")) tiquetes.add(new TiqueteBasico(false));
+                        else if (tipo.equalsIgnoreCase("Familiar")) tiquetes.add(new TiqueteFamiliar(new ArrayList<>(), false));
+                        else if (tipo.equalsIgnoreCase("Oro")) tiquetes.add(new TiqueteOro(new ArrayList<>(), false));
+                        else if (tipo.equalsIgnoreCase("Diamante")) tiquetes.add(new TiqueteDiamante(new ArrayList<>(), false));
+                    }
+                    lista.add(new Cliente(login, password, nombre, tiquetes));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("No se pudo leer el archivo CSV: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    private void escribirClientesEnCSV(String ruta) {
+        ArrayList<String> lineasCliente = new ArrayList<>();
+        for (Cliente cliente : clientes) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(cliente.getLogin()).append(",");
+            sb.append(cliente.getPassword()).append(",");
+            sb.append(cliente.getNombre()).append(",");
+
+            ArrayList<String> nombresTiquetes = new ArrayList<>();
+            for (Tiquete t : cliente.getTiquetes()) {
+                nombresTiquetes.add(t.getClass().getSimpleName().replace("Tiquete", ""));
+            }
+            sb.append(String.join(";", nombresTiquetes));
+
+            lineasCliente.add(sb.toString());
+        }
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ruta))) {
+            for (String linea : lineasCliente) {
+                pw.println(linea);
+            }
+        } catch (IOException e) {
+            System.out.println("Error al escribir en el archivo CSV: " + e.getMessage());
+        }
     }
 }

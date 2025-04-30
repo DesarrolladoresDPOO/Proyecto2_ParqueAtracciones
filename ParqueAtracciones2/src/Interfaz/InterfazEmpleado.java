@@ -71,7 +71,7 @@ public class InterfazEmpleado {
 
     public void iniciar() {
         while (true) {
-            System.out.println("=== MENÚ EMPLEADO ===");
+            System.out.println("=== MENU EMPLEADO ===");
             System.out.println("1. Validar ingreso a lugar de trabajo");
             System.out.println("2. Marcar asistencia del cliente");
             System.out.println("3. Ver historial del cliente");
