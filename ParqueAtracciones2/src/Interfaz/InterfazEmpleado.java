@@ -11,25 +11,71 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import persistencia.ArchivoPlano;
 import persona.Turno;
 import tiquetes.Cliente;
+import persona.Administrador;
 import persona.Cajero;
 import persona.Cocinero;
 import persona.Empleado;
+import persona.LugarServicio;
 import persona.OperadorMecanico;
 import persona.ServicioGeneral;
 
 public class InterfazEmpleado {
     private Scanner scanner = new Scanner(System.in);
 
+    
+    public void autenticarEmpleado() {
+        System.out.println("== AUTENTICACION DE EMPLEADO ==");
+
+        System.out.print("Usuario (Jero123): ");
+        String usuarioIngresado = scanner.nextLine();
+
+        System.out.print("Contraseña (pass8): ");
+        String contraseñaIngresada = scanner.nextLine();
+
+        ArchivoPlano archivoPlano = new ArchivoPlano();
+        ArrayList<String> empleados = archivoPlano.leer("datos/empleados.csv");
+
+        boolean autenticado = false;
+        String rolEmpleado = "";
+
+        for (String linea : empleados) {
+            String[] partes = linea.split(",");
+            if (partes.length >= 3) {
+                String rol = partes[0];
+                String usuario = partes[1];
+                String contraseña = partes[2];
+
+                if (!rol.equalsIgnoreCase("Administrador") &&
+                    usuario.equals(usuarioIngresado) &&
+                    contraseña.equals(contraseñaIngresada)) {
+                    autenticado = true;
+                    rolEmpleado = rol;
+                    break;
+                }
+            }
+        }
+
+        if (autenticado) {
+            System.out.println("Autenticación exitosa como " + rolEmpleado + ".");
+            iniciar();
+        } else {
+            System.out.println("Usuario o contraseña incorrectos. Acceso denegado.");
+        }
+    }
+
     public void iniciar() {
         while (true) {
             System.out.println("=== MENÚ EMPLEADO ===");
-            System.out.println("1. Validar ingreso a atraccion");
+            System.out.println("1. Validar ingreso a lugar de trabajo");
             System.out.println("2. Marcar asistencia del cliente");
             System.out.println("3. Ver historial del cliente");
+            System.out.println("4. Consultar turno Empleado");
             System.out.println("0. Salir");
             System.out.print("Elija una opcion: ");
             int opcion = scanner.nextInt();
@@ -38,12 +84,14 @@ public class InterfazEmpleado {
             if (opcion == 1) validarIngreso();
             else if (opcion == 2) marcarAsistencia();
             else if (opcion == 3) verHistorial();
+            else if (opcion == 4) verTurnos();
             else if (opcion == 0) break;
             else System.out.println("Opcion invalida.");
         }
     }
 
-    /**
+
+	/**
 	 * VALIDACION DEL INGRESO DE UN EMPLEADO DADO
 	 */
     public Empleado validarIngreso() {
@@ -78,7 +126,7 @@ public class InterfazEmpleado {
                     Turno turno = new Turno(tipoTurno, inicio, fin);
                     switch (rol.toLowerCase()) {
                         case "cajero":
-                            return new Cajero(loginArchivo, passwordArchivo, nombre, id, lugar, turno, false); // puedes cambiar false si lees capacitación
+                            return new Cajero(loginArchivo, passwordArchivo, nombre, id, lugar, turno, false);
                         case "cocinero":
                             return new Cocinero(loginArchivo, passwordArchivo, nombre, id, lugar, turno, false);
                         case "operadormecanico":
@@ -116,7 +164,7 @@ public class InterfazEmpleado {
                     String passwordCsv = partes[1];
                     String nombre = partes[2];
                     if (usuario.equals(usuarioCsv) && contraseña.equals(passwordCsv)) {
-                        return new Cliente(usuarioCsv, passwordCsv, nombre, new ArrayList<>()); // por ahora sin tiquetes
+                        return new Cliente(usuarioCsv, passwordCsv, nombre, new ArrayList<>());
                     }
                 }
             }
@@ -227,6 +275,55 @@ public class InterfazEmpleado {
         } catch (IOException e) {
             System.out.println("Error al leer historial.");
             e.printStackTrace();
+        }
+    }
+    
+    private void verTurnos() {
+    	ArchivoPlano archivoPlano = new ArchivoPlano();
+        ArrayList<String> lineasEmpleados = archivoPlano.leer("datos/empleados.csv");
+
+        System.out.println("Ingrese el nombre del empleado para verificar si tiene turnos:");
+        String nombreEmpleado = scanner.nextLine().trim();
+
+        boolean encontrado = false;
+
+        for (String linea : lineasEmpleados) {
+            // Formato esperado: tipo,login,password,nombre,id,departamento,turno
+            String[] datos = linea.split(",", 7);
+            if (datos.length < 7) continue;
+
+            String nombre = datos[3].trim();
+            String turnoStr = datos[6].trim();  
+            // Ejemplo: "Diurno (2025-04-02T08:00 - 2025-04-02T16:00)"
+
+            if (nombre.equalsIgnoreCase(nombreEmpleado)) {
+                encontrado = true;
+
+                if (turnoStr.equalsIgnoreCase("null") || turnoStr.isEmpty()) {
+                    System.out.println("Este empleado no tiene turno asignado.");
+                    return;
+                }
+
+                System.out.println("Ingrese la fecha para consultar turno (YYYY-MM-DD):");
+                String fechaTexto = scanner.nextLine().trim();
+
+                try {
+                    LocalDate fechaBuscada = LocalDate.parse(fechaTexto);
+                    if (turnoStr.contains(fechaBuscada.toString())) {
+                        System.out.println("El empleado tiene un turno asignado ese día:");
+                        System.out.println(turnoStr);
+                    } else {
+                        System.out.println("No tiene turno asignado para esa fecha.");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Fecha inválida. Use el formato YYYY-MM-DD.");
+                }
+                break;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("Empleado no encontrado.");
         }
     }
 }

@@ -66,7 +66,7 @@ public class InterfazAdmin {
 
         if (autenticado) {
             System.out.println("Autenticacion exitosa");
-            iniciar(); // Aquí llamas a tu método iniciar()
+            iniciar();
         } else {
             System.out.println("Usuario o contraseña incorrectos. Acceso denegado.");
         }
