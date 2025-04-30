@@ -1,6 +1,7 @@
 package persona;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Turno {
     private String tipo; // "Diurno" o "Nocturno"
@@ -41,6 +42,7 @@ public class Turno {
 
     @Override
     public String toString() {
-        return tipo + " (" + horaInicio + " - " + horaFin + ")";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        return tipo + " (" + horaInicio.format(formatter) + " - " + horaFin.format(formatter) + ")";
     }
 }

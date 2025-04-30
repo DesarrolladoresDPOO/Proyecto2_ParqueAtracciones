@@ -3,7 +3,7 @@ package Interfaz;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -12,6 +12,11 @@ import atracciones.Atraccion;
 import atracciones.AtraccionCultural;
 
 import persistencia.ArchivoPlano;
+import persona.Cajero;
+import persona.Cocinero;
+import persona.Empleado;
+import persona.OperadorMecanico;
+import persona.ServicioGeneral;
 import persona.Turno;
 
 public class InterfazAdmin {
@@ -20,6 +25,7 @@ public class InterfazAdmin {
 	private AtraccionCultural atraccionCultural;
 	private List<Atraccion> atracciones;
 	private List<Turno> turnosDisponibles = new ArrayList<>();
+	private ArrayList<Empleado> empleados = new ArrayList<>();
 	
 	// Objeto para lectura de archivos
     private ArchivoPlano archivoPlano;
@@ -144,17 +150,16 @@ public class InterfazAdmin {
 		
 		while (true) {
 			
-			System.out.println("========================================");
-			System.out.println("|        MENÚ DE ADMINISTRADOR         |");
-			System.out.println("========================================");
-			System.out.println("| 1. Crear atracción                   |");
-			System.out.println("| 2. Modificar atracción               |");
-			System.out.println("| 3. Eliminar atracción                |");
-			System.out.println("| 4. Crear nuevo turno                 |");
-			System.out.println("| 5. Asignar turno a empleado          |");
-			System.out.println("| 0. Salir                             |");
-			System.out.println("========================================");
-			System.out.print ("Seleccione una opción: ");
+			System.out.println("        MENU DE ADMINISTRADOR         ");
+			System.out.println("======================================");
+			System.out.println(" 1. Crear atraccion                   ");
+			System.out.println(" 2. Modificar atraccion               ");
+			System.out.println(" 3. Eliminar atracción                ");
+			System.out.println(" 4. Crear nuevo turno                 ");
+			System.out.println(" 5. Asignar turno a empleado          ");
+			System.out.println(" 6. Crear un nuevo empleado           ");
+			System.out.println(" 0. Salir                             ");
+			System.out.print ("Seleccione una opcion: ");
 			int opcion = scanner.nextInt();
 			scanner.nextLine();
 
@@ -163,6 +168,7 @@ public class InterfazAdmin {
 			else if (opcion == 3) eliminarAtraccion();
 			else if (opcion == 4) crearTurno();
 			else if (opcion == 5) AsignarNuevoTurno();
+			else if (opcion == 6) CrearEmpleado();
 			else if (opcion == 0) break;
 			else System.out.println("Opcion invalida.");
 		}
@@ -459,7 +465,7 @@ public class InterfazAdmin {
 
 	    // Usamos una excepcion por si se ingresa incorrectamente la fecha, si no se hace se produciria error
 	    } catch (Exception e) {
-	        System.out.println("Error al crear el turno. Asegúrese de ingresar los datos en el formato correcto.");
+	        System.out.println("Error al crear el turno. Asegurese de ingresar los datos en el formato correcto.");
 	    }
 	}
 	/**
@@ -480,7 +486,7 @@ public class InterfazAdmin {
 	        }
 	    }
 
-	    System.out.print("Seleccione el número del empleado al que desea asignar un nuevo turno: ");
+	    System.out.print("Seleccione el numero del empleado al que desea asignar un nuevo turno: ");
 	    int opcionEmpleado = Integer.parseInt(scanner.nextLine()) - 1;
 
 	    if (opcionEmpleado < 0 || opcionEmpleado >= empleadosActuales.size()) {
@@ -499,7 +505,7 @@ public class InterfazAdmin {
 	        System.out.println((i + 1) + ". " + turnosDisponibles.get(i));
 	    }
 
-	    System.out.print("Seleccione el número del turno que desea asignar: ");
+	    System.out.print("Seleccione el numero del turno que desea asignar: ");
 	    int opcionTurno = Integer.parseInt(scanner.nextLine()) - 1;
 
 	    if (opcionTurno < 0 || opcionTurno >= turnosDisponibles.size()) {
@@ -524,4 +530,74 @@ public class InterfazAdmin {
 	    archivoPlano.escribir("datos/empleados.csv", empleadosActuales);
 	    System.out.println("Turno asignado exitosamente a " + partes[3]);
 	}
+	
+	/**
+     * FUNCION QUE PERMITE CREAR UN NUEVO EMPLEADO
+     */
+	private void CrearEmpleado() {
+	    // Registro manual de empleado
+	    System.out.println("\n== Registro de nuevo empleado ==");
+
+	    System.out.print("Ingrese el nombre: ");
+	    String nombreEmpleado = scanner.nextLine();
+
+	    System.out.print("Ingrese login: ");
+	    String login = scanner.nextLine();
+
+	    System.out.print("Ingrese contraseña: ");
+	    String password = scanner.nextLine();
+
+	    System.out.println("Seleccione el tipo de empleado a registrar:");
+	    System.out.println("1. Cajero\n2. Cocinero\n3. Operador Mecanico\n4. Servicio General");
+	    int tipo = scanner.nextInt();
+	    scanner.nextLine();
+
+	    Empleado nuevoEmpleado = null;
+
+	    if (tipo == 1) {
+	        nuevoEmpleado = new Cajero(login, password, nombreEmpleado, 1, "Taquilla", null, true);
+	    } else if (tipo == 2) {
+	        nuevoEmpleado = new Cocinero(login, password, nombreEmpleado, 1, "Cocina", null, true);
+	    } else if (tipo == 3) {
+	        nuevoEmpleado = new OperadorMecanico(login, password, nombreEmpleado, 1, "MontanaRusa", true, atraccionMecanica, null);
+	    } else if (tipo == 4) {
+	        nuevoEmpleado = new ServicioGeneral(login, password, nombreEmpleado, 1, "Baños", null);
+	    } else {
+	        System.out.println("Tipo de empleado invalido.");
+	        return;
+	    }
+
+	    // Mostrar turnos disponibles
+	    if (turnosDisponibles.isEmpty()) {
+	        System.out.println("No hay turnos disponibles actualmente.");
+	        return;
+	    }
+
+	    System.out.println("Seleccione el numero del turno que desea asignar al empleado:");
+	    for (int i = 0; i < turnosDisponibles.size(); i++) {
+	        System.out.println((i + 1) + ". " + turnosDisponibles.get(i));
+	    }
+
+	    int seleccionTurno = scanner.nextInt();
+	    scanner.nextLine();
+
+	    if (seleccionTurno < 1 || seleccionTurno > turnosDisponibles.size()) {
+	        System.out.println("Selección de turno invalida.");
+	        return;
+	    }
+
+	    Turno turnoSeleccionado = turnosDisponibles.get(seleccionTurno - 1);
+	    nuevoEmpleado.asignarTurno(turnoSeleccionado.getHoraInicio().toLocalDate(), turnoSeleccionado);
+	    nuevoEmpleado.setTurno(turnoSeleccionado); 
+
+	    // Agregar a la lista
+	    empleados.add(nuevoEmpleado);
+
+	    // Guardar solo este nuevo empleado en el archivo
+	    ArchivoPlano archivoPlano = new ArchivoPlano();
+	    archivoPlano.escribirEmpleadoAppend("datos/empleados.csv", nuevoEmpleado);
+
+	    System.out.println("Empleado registrado exitosamente.");
+	}
+	
 }

@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import persona.Empleado;
 
 public class ArchivoPlano {
 
@@ -40,5 +43,25 @@ public class ArchivoPlano {
 		return lineasTexto;
 	}
 	
+	public void escribirEmpleadoAppend(String ruta, Empleado empleado) {
+	    try (FileWriter fw = new FileWriter(ruta, true);
+	         BufferedWriter bw = new BufferedWriter(fw);
+	         PrintWriter out = new PrintWriter(bw)) {
+	        
+	        StringBuilder sb = new StringBuilder();
+	        sb.append(empleado.getClass().getSimpleName()).append(",");
+	        sb.append(empleado.getLogin()).append(",");
+	        sb.append(empleado.getPassword()).append(",");
+	        sb.append(empleado.getNombre()).append(",");
+	        sb.append(empleado.getId()).append(",");
+	        sb.append(empleado.getLugarTrabajo()).append(",");
+	        sb.append(empleado.getTurno());
+
+	        out.println(sb.toString());
+
+	    } catch (IOException e) {
+	        System.out.println("Error al escribir empleado: " + e.getMessage());
+	    }
+	}
 	
 }

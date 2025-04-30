@@ -43,6 +43,9 @@ public class InterfazEmpleado {
         }
     }
 
+    /**
+	 * VALIDACION DEL INGRESO DE UN EMPLEADO DADO
+	 */
     public Empleado validarIngreso() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Ingrese su usuario: ");
