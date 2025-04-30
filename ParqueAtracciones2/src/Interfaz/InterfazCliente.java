@@ -121,7 +121,7 @@ public class InterfazCliente {
         System.out.println("4. Diamante");
         int tipo = Integer.parseInt(scanner.nextLine());
 
-        List<Atraccion> atraccionesVacias = new ArrayList<>(); // Simulación
+        List<Atraccion> atraccionesVacias = new ArrayList<>();
         Tiquete nuevo;
         if (tipo == 1) {
             nuevo = new TiqueteBasico(fastPass);
