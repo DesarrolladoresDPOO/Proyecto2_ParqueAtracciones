@@ -80,7 +80,7 @@ El proyecto incluye pruebas unitarias e integradas usando **JUnit 5**. Las prueb
 - Consulta y asignación de turnos
 - Registro de historial de asistencias
 
-La cobertura supera el **90%** en clases funcionales principales (excluyendo getters/setters triviales).
+La cobertura supera el **80%** en clases funcionales principales (excluyendo getters/setters triviales).
 
 ---
 
