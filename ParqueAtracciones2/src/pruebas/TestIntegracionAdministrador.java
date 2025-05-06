@@ -30,24 +30,24 @@ public class TestIntegracionAdministrador {
     @Test
     public void flujoAdministrador() throws Exception {
     	
-    	// Crear turno
+    	// crear turno
         LocalDateTime inicioDiurno = LocalDateTime.of(2025, 4, 2, 8, 0);
 		LocalDateTime finDiurno = LocalDateTime.of(2025, 4, 2, 16, 0);
         Turno turnoDiurno = new Turno("Diurno", inicioDiurno, finDiurno);
         
-        // Crear administrador
+        // crear administrador
         Administrador admin = new Administrador("CamilaS1", "123","Camila Serrano", 1001, "Gerencia", turnoDiurno);
 
-        // Crear atracción mecánica
+        // crear atracción mecánica
         AtraccionMecanica atraccion = new AtraccionMecanica("Montaña Rusa", 30, 5, true, "Alta",120, 200, 30, 100, "A,B,C", "Alta");
 
-        // Crear empleado y lugar
+        // crear empleado y lugar
         OperadorMecanico operador = new OperadorMecanico("Juan123", "123", "Juan Carlos Restrepo", 1001, "Mantenimiento", true, atraccion, turnoDiurno);
         LocalDate fechaTurno = LocalDate.of(2025, 4, 2);
-        // Asignar turno
+        // asignar turno
         admin.asignarTurno(operador, fechaTurno, turnoDiurno);
 
-        // Verificar turno asignado
+        // verificar turno asignado
         Turno turno = operador.consultarTurno(fechaTurno);
         assertEquals("Diurno", turno.getTipo());
     }
@@ -59,7 +59,7 @@ public class TestIntegracionAdministrador {
     void setUp() throws IOException {
         Files.createDirectories(Paths.get("datos"));
 
-        // Asegurar archivo empleados.csv
+        // asegurar archivo empleados.csv
         Path empleadosFile = Paths.get(empleadosPath);
         if (!Files.exists(empleadosFile)) Files.createFile(empleadosFile);
 
@@ -70,7 +70,7 @@ public class TestIntegracionAdministrador {
             Files.write(empleadosFile, List.of("Administrador,admin1,adminpass,Juan,1001,Oficina,NULL"), StandardOpenOption.APPEND);
         }
 
-        // Limpiar línea duplicada de atracción
+        // limpiar linea duplicada de atraccion
         Path atraccionesFile = Paths.get(atraccionesPath);
         if (!Files.exists(atraccionesFile)) Files.createFile(atraccionesFile);
 
@@ -91,10 +91,10 @@ public class TestIntegracionAdministrador {
         String simulatedInput = String.join(System.lineSeparator(),
             "admin1",                   // Usuario
             "adminpass",                // Contraseña
-            "1",                        // Opción: Crear atracción
-            "1",                        // Tipo: Mecánica
+            "1",                        // Opción: Crear atraccion
+            "1",                        // Tipo: Mecanica
             "Montaña Loca",            // Nombre
-            "20",                      // Cupo máximo
+            "20",                      // Cupo maximo
             "3",                       // Empleados encargados
             "true",                    // Clima
             "Oro",                     // Exclusividad

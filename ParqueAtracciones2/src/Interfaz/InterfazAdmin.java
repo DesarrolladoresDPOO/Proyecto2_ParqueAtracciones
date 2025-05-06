@@ -93,7 +93,7 @@ public class InterfazAdmin {
 		    String[] datos = linea.split(",");
 		    
 		    if (datos.length < 6) {
-		        System.out.println("Línea inválida (campos insuficientes): " + linea);
+		        System.out.println("Linea invalida (campos insuficientes): " + linea);
 		        continue;
 		    }
 
@@ -107,7 +107,7 @@ public class InterfazAdmin {
 		    switch (tipoExistente) {
 		        case "Mecanica":
 		            if (datos.length < 12) {
-		                System.out.println("Línea inválida para atracción mecánica: " + linea);
+		                System.out.println("Linea invalida para atraccion mecanica: " + linea);
 		                continue;
 		            }
 		            int minimoAlturaExistente = Integer.parseInt(datos[6]);
@@ -129,7 +129,7 @@ public class InterfazAdmin {
 
 		        case "Cultural":
 		            if (datos.length < 7) {
-		                System.out.println("Línea inválida para atracción cultural: " + linea);
+		                System.out.println("Linea invalida para atracción cultural: " + linea);
 		                continue;
 		            }
 		            int edad = Integer.parseInt(datos[6]);
@@ -142,7 +142,7 @@ public class InterfazAdmin {
 		            break;
 
 		        default:
-		            System.out.println("Tipo de atracción desconocido: " + tipoExistente);
+		            System.out.println("Tipo de atraccion desconocido: " + tipoExistente);
 		    }
 		}
 		
@@ -150,11 +150,10 @@ public class InterfazAdmin {
 		
 		while (true) {
 			
-			System.out.println("        MENU DE ADMINISTRADOR         ");
-			System.out.println("======================================");
+			System.out.println("       === MENU ADMINISTRADOR ===       ");
 			System.out.println(" 1. Crear atraccion                   ");
 			System.out.println(" 2. Modificar atraccion               ");
-			System.out.println(" 3. Eliminar atracción                ");
+			System.out.println(" 3. Eliminar atraccion                ");
 			System.out.println(" 4. Crear nuevo turno                 ");
 			System.out.println(" 5. Asignar turno a empleado          ");
 			System.out.println(" 6. Crear un nuevo empleado           ");
@@ -179,8 +178,8 @@ public class InterfazAdmin {
          * MENU QUE PERMITE CREAR UNA NUEVA ATRACCION
          */
 	    System.out.println("Seleccione el tipo de atraccion que desea registrar:");
-	    System.out.println("1. Atracción Mecánica");
-	    System.out.println("2. Atracción Cultural");
+	    System.out.println("1. Atraccion Mecanica");
+	    System.out.println("2. Atraccion Cultural");
 	    int opcion = scanner.nextInt();
 	    scanner.nextLine();
 
@@ -189,7 +188,7 @@ public class InterfazAdmin {
 	    System.out.print("Ingrese el nombre de la atraccion: ");
 	    String nombre = scanner.nextLine();
 
-	    // Verificamos que el nombre de la nueva atraccion sea nuevo
+	    // verificamos que el nombre de la nueva atraccion sea nuevo
 	    for (Atraccion a : atracciones) {
 	        if (a.getNombre().equalsIgnoreCase(nombre)) {
 	            System.out.println("Ya existe una atraccion registrada con ese nombre.");
@@ -203,7 +202,7 @@ public class InterfazAdmin {
 	    System.out.print("Ingrese la cantidad de empleados encargados: ");
 	    int empleadosEncargados = scanner.nextInt();
 
-	    System.out.print("¿La atraccion está disponible en condiciones climaticas adversas? (true/false): ");
+	    System.out.print("¿La atraccion esta disponible en condiciones climaticas adversas? (true/false): ");
 	    boolean disponibleClima = scanner.nextBoolean();
 	    scanner.nextLine();
 
@@ -298,7 +297,7 @@ public class InterfazAdmin {
      * FUNCION PARA MODIFICAR LA INFORMACION DE UNA ATRACCION EN ESPECIFICO
      */
 	private void modificarAtraccion() {
-		System.out.println("== Modificar atracción ==");
+		System.out.println("== Modificar atraccion ==");
 
 		archivoPlano = new ArchivoPlano();
 		ArrayList<String> atraccionesActuales = archivoPlano.leer("datos/atracciones.csv");
@@ -325,24 +324,24 @@ public class InterfazAdmin {
 	            encontrada = true;
 
 	            // Mostramos los datos actuales
-	            System.out.println("\nDatos actuales de la atracción:");
+	            System.out.println("\nDatos actuales de la atraccion:");
 	            System.out.println("Atraccion de tipo: " + partes[0]);
 	            System.out.println("Nombre: " + partes[1]);
 	            System.out.println("Cupo máximo: " + partes[2]);
 	            System.out.println("Empleados encargados: " + partes[3]);
 	            System.out.println("Disponible con clima adverso: " + partes[4]);
 	            System.out.println("Nivel de exclusividad: " + partes[5]);
-	            System.out.println("Altura mínima (cm): " + partes[6]);
+	            System.out.println("Altura minima (cm): " + partes[6]);
 	            System.out.println("Altura máxima (cm): " + partes[7]);
-	            System.out.println("Peso mínimo (kg): " + partes[8]);
-	            System.out.println("Peso máximo (kg): " + partes[9]);
+	            System.out.println("Peso minimo (kg): " + partes[8]);
+	            System.out.println("Peso maximo (kg): " + partes[9]);
 	            System.out.println("Restricciones de salud: " + partes[10]);
 	            System.out.println("Nivel de riesgo: " + partes[11]);
 
 	            // Solicitamos los nuevos datos
 	            System.out.println("\n== Ingrese los nuevos datos de la atraccion ==");
 
-	            System.out.print("Ingrese el tipo de atracción (Cultural/Mecánica): ");
+	            System.out.print("Ingrese el tipo de atraccion (Cultural/Mecanica): ");
 	            String tipo = scanner.nextLine();
 	            String tipoAtraccion = "";
 	            if (tipo.equalsIgnoreCase("Cultural")) {
@@ -364,16 +363,16 @@ public class InterfazAdmin {
 	            System.out.print("Ingrese el nivel de exclusividad: ");
 	            String nivelExclusividad = scanner.nextLine();
 
-	            System.out.print("Ingrese la altura mínima (cm): ");
+	            System.out.print("Ingrese la altura minima (cm): ");
 	            int minAltura = scanner.nextInt();
 
-	            System.out.print("Ingrese la altura máxima (cm): ");
+	            System.out.print("Ingrese la altura maxima (cm): ");
 	            int maxAltura = scanner.nextInt();
 
-	            System.out.print("Ingrese el peso mínimo (kg): ");
+	            System.out.print("Ingrese el peso minimo (kg): ");
 	            int minPeso = scanner.nextInt();
 
-	            System.out.print("Ingrese el peso máximo (kg): ");
+	            System.out.print("Ingrese el peso maximo (kg): ");
 	            int maxPeso = scanner.nextInt();
 	            scanner.nextLine();
 
@@ -395,9 +394,9 @@ public class InterfazAdmin {
 
 	    if (encontrada) {
 	        archivoPlano.escribir("datos/atracciones.csv", atraccionesModificadas);
-	        System.out.println("\nLa atracción ha sido modificada exitosamente.");
+	        System.out.println("\nLa atraccion ha sido modificada exitosamente.");
 	    } else {
-	        System.out.println("\nNo se encontró ninguna atracción registrada con ese nombre.");
+	        System.out.println("\nNo se encontro ninguna atraccion registrada con ese nombre.");
 	    }
 	}
 
@@ -405,9 +404,9 @@ public class InterfazAdmin {
      * FUNCION PARA ELIMINAR UNA ATRACCION EN ESPECIFICO
      */
 	private void eliminarAtraccion() {
-	    System.out.println("== Eliminar atracción ==");
+	    System.out.println("== Eliminar atraccion ==");
 
-	    System.out.print("Ingrese el nombre de la atracción que desea eliminar: ");
+	    System.out.print("Ingrese el nombre de la atraccion que desea eliminar: ");
 	    String nombreAEliminar = scanner.nextLine();
 
 	    archivoPlano = new ArchivoPlano();
@@ -427,9 +426,9 @@ public class InterfazAdmin {
 
 	    if (encontrada) {
 	        archivoPlano.escribir("datos/atracciones.csv", atraccionesActualizadas);
-	        System.out.println("Atracción eliminada exitosamente: " + nombreAEliminar);
+	        System.out.println("Atraccion eliminada exitosamente: " + nombreAEliminar);
 	    } else {
-	        System.out.println("No se encontró una atracción con ese nombre.");
+	        System.out.println("No se encontro una atracción con ese nombre.");
 	    }
 	}
 	/**
@@ -509,7 +508,7 @@ public class InterfazAdmin {
 	    int opcionTurno = Integer.parseInt(scanner.nextLine()) - 1;
 
 	    if (opcionTurno < 0 || opcionTurno >= turnosDisponibles.size()) {
-	        System.out.println("Turno no válido.");
+	        System.out.println("Turno no valido.");
 	        return;
 	    }
 

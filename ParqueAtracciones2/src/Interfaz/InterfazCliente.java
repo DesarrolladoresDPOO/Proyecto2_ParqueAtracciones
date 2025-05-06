@@ -1,59 +1,41 @@
 package Interfaz;
 
 import java.util.*;
+import java.io.*;
 
 import atracciones.Atraccion;
-import tiquetes.Cliente;
-import tiquetes.Tiquete;
-import tiquetes.TiqueteBasico;
-import tiquetes.TiqueteDiamante;
-import tiquetes.TiqueteFamiliar;
-import tiquetes.TiqueteOro;
-
-import java.io.*;
+import tiquetes.*;
 
 public class InterfazCliente {
     private List<Cliente> clientes;
+    private Scanner scanner;
 
     public InterfazCliente() {
         this.clientes = leerClientesDesdeCSV("datos/clientes.csv");
+        this.scanner = new Scanner(System.in);  
     }
 
     public void iniciar() {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\n=== MENU CLIENTE ===");
             System.out.println("1. Comprar tiquete");
             System.out.println("2. Consultar tiquetes de un cliente");
             System.out.println("3. Registrar un nuevo cliente");
             System.out.println("0. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.print("Seleccione una opcion: ");
             String opcion = scanner.nextLine();
 
             switch (opcion) {
-                case "1":
-                    comprarTiquete();
-                    break;
-                case "2":
-                    consultarTiquetesCliente();
-                    break;
-                case "3":
-                	registrarseComoCliente();
-                    break;
-                case "0":
-                    escribirClientesEnCSV("datos/clientes.csv");
-                    return;
-                default:
-                    System.out.println("Opción inválida.");
+                case "1": comprarTiquete(); break;
+                case "2": consultarTiquetesCliente(); break;
+                case "3": registrarseComoCliente(); break;
+                case "0": escribirClientesEnCSV("datos/clientes.csv"); return;
+                default: System.out.println("Opcion invalida.");
             }
         }
     }
-    
-    /**
-	 * REGISTRO DE UN NUEVO CLIENTE
-	 */
+
     public void registrarseComoCliente() {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese el nombre del nuevo cliente:");
         String nombreCliente = scanner.nextLine();
 
@@ -67,7 +49,7 @@ public class InterfazCliente {
         System.out.println("Ingrese login:");
         String login = scanner.nextLine();
 
-        System.out.println("Ingrese contraseña:");
+        System.out.println("Ingrese contrasena:");
         String password = scanner.nextLine();
 
         Cliente nuevoCliente = new Cliente(login, password, nombreCliente, new ArrayList<>());
@@ -76,12 +58,8 @@ public class InterfazCliente {
 
         System.out.println("Cliente registrado exitosamente sin comprar un tiquete.");
     }
-    
-    /**
-	 * COMPRAR UN TIQUETE PARA UN CLIENTE, SI ESTE NO EXISTE SE REGISTRA
-	 */
+
     private void comprarTiquete() {
-        Scanner scanner = new Scanner(System.in);
         ArrayList<Tiquete> tiqueteCliente = new ArrayList<>();
         System.out.println("Ingrese el nombre del cliente que desea comprar un tiquete:");
         String nombreCliente = scanner.nextLine();
@@ -95,12 +73,12 @@ public class InterfazCliente {
         }
 
         if (clienteEncontrado == null) {
-            System.out.println("Cliente no encontrado. ¿Desea registrarlo? (s/n)");
+            System.out.println("Cliente no encontrado. Desea registrarlo? (s/n)");
             String respuesta = scanner.nextLine();
             if (respuesta.equalsIgnoreCase("s")) {
                 System.out.println("Ingrese login:");
                 String login = scanner.nextLine();
-                System.out.println("Ingrese contraseña:");
+                System.out.println("Ingrese contrasena:");
                 String password = scanner.nextLine();
                 clienteEncontrado = new Cliente(login, password, nombreCliente, tiqueteCliente);
                 clientes.add(clienteEncontrado);
@@ -111,11 +89,11 @@ public class InterfazCliente {
             }
         }
 
-        System.out.println("¿Desea agregar FastPass? (s/n)");
+        System.out.println("Desea agregar FastPass? (s/n)");
         boolean fastPass = scanner.nextLine().equalsIgnoreCase("s");
 
         System.out.println("Seleccione el tipo de tiquete a comprar:");
-        System.out.println("1. Básico");
+        System.out.println("1. Basico");
         System.out.println("2. Familiar");
         System.out.println("3. Oro");
         System.out.println("4. Diamante");
@@ -123,16 +101,12 @@ public class InterfazCliente {
 
         List<Atraccion> atraccionesVacias = new ArrayList<>();
         Tiquete nuevo;
-        if (tipo == 1) {
-            nuevo = new TiqueteBasico(fastPass);
-        } else if (tipo == 2) {
-            nuevo = new TiqueteFamiliar(atraccionesVacias, fastPass);
-        } else if (tipo == 3) {
-            nuevo = new TiqueteOro(atraccionesVacias, fastPass);
-        } else if (tipo == 4) {
-            nuevo = new TiqueteDiamante(atraccionesVacias, fastPass);
-        } else {
-            System.out.println("Tipo de tiquete inválido.");
+        if (tipo == 1) nuevo = new TiqueteBasico(fastPass);
+        else if (tipo == 2) nuevo = new TiqueteFamiliar(atraccionesVacias, fastPass);
+        else if (tipo == 3) nuevo = new TiqueteOro(atraccionesVacias, fastPass);
+        else if (tipo == 4) nuevo = new TiqueteDiamante(atraccionesVacias, fastPass);
+        else {
+            System.out.println("Tipo de tiquete invalido.");
             return;
         }
 
@@ -142,11 +116,7 @@ public class InterfazCliente {
         escribirClientesEnCSV("datos/clientes.csv");
     }
 
-    /**
-	 * CONSULTA LOS TIQUETES DE UN CLIENTE DADO
-	 */
     private void consultarTiquetesCliente() {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese el nombre del cliente:");
         String nombreCliente = scanner.nextLine();
         boolean encontrado = false;
@@ -160,7 +130,7 @@ public class InterfazCliente {
                 } else {
                     System.out.println("Tiquetes de " + c.getNombre() + ":");
                     for (Tiquete t : listaTiq) {
-                        System.out.println("- Tipo: " + t.getTipo() + ", Usado: " + (t.isUsado() ? "Sí" : "No"));
+                        System.out.println("- Tipo: " + t.getTipo() + ", Usado: " + (t.isUsado() ? "Si" : "No"));
                     }
                 }
                 break;
@@ -172,9 +142,6 @@ public class InterfazCliente {
         }
     }
 
-    /**
-	 * METODOS LECTURA Y ESCRITURA CLIENTES
-	 */
     private List<Cliente> leerClientesDesdeCSV(String ruta) {
         List<Cliente> lista = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
