@@ -326,4 +326,85 @@ public class InterfazEmpleado {
             System.out.println("Empleado no encontrado.");
         }
     }
+    
+    public boolean registrarAsistenciaGUI(String usuario, String contrasena) {
+        Cliente cliente = autenticarCliente(usuario, contrasena);
+        if (cliente == null) return false;
+
+        LocalDate hoy = LocalDate.now();
+        LocalTime hora = LocalTime.now();
+        String fecha = hoy.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String horaTexto = hora.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String lineaNueva = cliente.getNombre() + "," + fecha + "," + horaTexto;
+
+        File archivo = new File("datos/asistencias_clientes.csv");
+
+        try {
+            if (archivo.exists()) {
+                BufferedReader br = new BufferedReader(new FileReader(archivo));
+                String linea;
+                while ((linea = br.readLine()) != null) {
+                    String[] partes = linea.split(",");
+                    if (partes.length >= 2 && partes[0].equals(cliente.getNombre()) && partes[1].equals(fecha)) {
+                        br.close();
+                        return false;  // Ya registrado
+                    }
+                }
+                br.close();
+            }
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(archivo, true));
+            bw.write(lineaNueva);
+            bw.newLine();
+            bw.close();
+            return true;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String historialAsistenciaGUI(String usuario, String contrasena) {
+        Cliente cliente = autenticarCliente(usuario, contrasena);
+        if (cliente == null) return "Cliente no encontrado.";
+
+        File archivo = new File("datos/asistencias_clientes.csv");
+        if (!archivo.exists()) return "No hay historial disponible.";
+
+        StringBuilder historial = new StringBuilder();
+        boolean tiene = false;
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(archivo));
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                if (partes.length >= 3 && partes[0].equals(cliente.getNombre())) {
+                    historial.append("• ").append(partes[1]).append(" a las ").append(partes[2]).append("\n");
+                    tiene = true;
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return tiene ? historial.toString() : "No hay asistencias registradas.";
+    }
+
+    private Cliente autenticarCliente(String usuario, String contrasena) {
+        try (BufferedReader br = new BufferedReader(new FileReader("datos/clientes.csv"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                if (partes.length >= 3 && partes[0].equals(usuario) && partes[1].equals(contrasena)) {
+                    return new Cliente(partes[0], partes[1], partes[2], new ArrayList<>());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

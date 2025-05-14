@@ -194,4 +194,51 @@ public class InterfazCliente {
             System.out.println("Error al escribir en el archivo CSV: " + e.getMessage());
         }
     }
+ // NUEVO: usar desde Swing
+    public String consultarTiquetesPorNombre(String nombreCliente) {
+        for (Cliente c : clientes) {
+            if (c.getNombre().equalsIgnoreCase(nombreCliente)) {
+                StringBuilder sb = new StringBuilder();
+                List<Tiquete> lista = c.getTiquetes();
+                if (lista.isEmpty()) {
+                    return "Este cliente no tiene tiquetes.";
+                } else {
+                    for (Tiquete t : lista) {
+                        sb.append("- Tipo: ").append(t.getTipo())
+                          .append(" | Usado: ").append(t.isUsado() ? "Sí" : "No").append("\n");
+                    }
+                    return sb.toString();
+                }
+            }
+        }
+        return "Cliente no encontrado.";
+    }
+
+    public String comprarTiqueteSwing(String nombreCliente, int tipo, boolean fastPass) {
+        Cliente clienteEncontrado = null;
+        for (Cliente c : clientes) {
+            if (c.getNombre().equalsIgnoreCase(nombreCliente)) {
+                clienteEncontrado = c;
+                break;
+            }
+        }
+        if (clienteEncontrado == null) {
+            return "Cliente no encontrado.";
+        }
+
+        List<Atraccion> atraccionesVacias = new ArrayList<>();
+        Tiquete nuevo;
+        switch (tipo) {
+            case 1: nuevo = new TiqueteBasico(fastPass); break;
+            case 2: nuevo = new TiqueteFamiliar(atraccionesVacias, fastPass); break;
+            case 3: nuevo = new TiqueteOro(atraccionesVacias, fastPass); break;
+            case 4: nuevo = new TiqueteDiamante(atraccionesVacias, fastPass); break;
+            default: return "Tipo de tiquete inválido.";
+        }
+
+        clienteEncontrado.comprarTiquete(nuevo);
+        escribirClientesEnCSV("datos/clientes.csv");
+        return "Tiquete agregado exitosamente a " + clienteEncontrado.getNombre();
+    }
+    
 }
