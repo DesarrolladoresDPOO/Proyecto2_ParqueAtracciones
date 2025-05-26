@@ -29,13 +29,13 @@ public class VentanaPrincipal extends JFrame {
         });
         btnEmpleado.addActionListener(e -> {
             InterfazEmpleado controlador = new InterfazEmpleado();
-            new VentanaAsistenciaEmpleado(controlador); 
+            new VentanaAsistenciaEmpleado(controlador); 	
             dispose();
         });
         btnAdmin.addActionListener(e -> {
             InterfazAdmin controlador = new InterfazAdmin();
-            controlador.autenticarYIniciar(); // Si luego haces GUI admin, cámbialo
-            // Aquí se queda en consola porque admin aún no tiene GUI
+            new VentanaAdmin(controlador);
+            dispose();
         });
         panel.add(btnCliente);
         panel.add(btnEmpleado);

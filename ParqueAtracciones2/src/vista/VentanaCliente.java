@@ -25,7 +25,10 @@ public class VentanaCliente extends JFrame {
 
         btnComprar.addActionListener(e -> mostrarCompra());
         btnConsultar.addActionListener(e -> mostrarConsulta());
-        btnRegistrar.addActionListener(e -> controlador.registrarseComoCliente()); // Usa método de consola por ahora
+        btnRegistrar.addActionListener(e -> {
+            String resultado = controlador.registrarseComoClienteSwing(this);
+            JOptionPane.showMessageDialog(this, resultado);
+        });
         btnSalir.addActionListener(e -> System.exit(0));
 
         panel.add(btnComprar);

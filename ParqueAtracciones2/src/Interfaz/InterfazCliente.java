@@ -1,6 +1,10 @@
 package Interfaz;
 
 import java.util.*;
+
+import javax.swing.JOptionPane;
+
+import java.awt.Component;
 import java.io.*;
 
 import atracciones.Atraccion;
@@ -241,4 +245,31 @@ public class InterfazCliente {
         return "Tiquete agregado exitosamente a " + clienteEncontrado.getNombre();
     }
     
+    public String registrarseComoClienteSwing(Component parentComponent) {
+        try {
+            String nombre = JOptionPane.showInputDialog(parentComponent, "Nombre del nuevo cliente:");
+            if (nombre == null || nombre.trim().isEmpty()) return "Registro cancelado.";
+
+            for (Cliente c : clientes) {
+                if (c.getNombre().equalsIgnoreCase(nombre)) {
+                    return "Ya existe un cliente con ese nombre.";
+                }
+            }
+
+            String login = JOptionPane.showInputDialog(parentComponent, "Login del cliente:");
+            if (login == null || login.trim().isEmpty()) return "Registro cancelado.";
+
+            String password = JOptionPane.showInputDialog(parentComponent, "Contraseña:");
+            if (password == null || password.trim().isEmpty()) return "Registro cancelado.";
+
+            Cliente nuevo = new Cliente(login.trim(), password.trim(), nombre.trim(), new ArrayList<>());
+            clientes.add(nuevo);
+            escribirClientesEnCSV("datos/clientes.csv");
+
+            return "Cliente registrado exitosamente.";
+        } catch (Exception e) {
+            return "Error durante el registro: " + e.getMessage();
+        }
+    }
+
 }

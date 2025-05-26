@@ -3,6 +3,9 @@ package Interfaz;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,8 +30,15 @@ public class InterfazAdmin {
 	private List<Turno> turnosDisponibles = new ArrayList<>();
 	private ArrayList<Empleado> empleados = new ArrayList<>();
 	
+	
 	// Objeto para lectura de archivos
     private ArchivoPlano archivoPlano;
+    public InterfazAdmin() {
+        this.atracciones = new ArrayList<>();
+        this.turnosDisponibles = new ArrayList<>();
+        this.empleados = new ArrayList<>();
+        this.archivoPlano = new ArchivoPlano();
+    }
     
     /**
 	 * VERIFICACION DE LA INFORMACION DEL ADMINISTRADOR
@@ -173,7 +183,7 @@ public class InterfazAdmin {
 		}
 	}
 
-	private void crearAtraccion() {
+	public void crearAtraccion() {
 		/**
          * MENU QUE PERMITE CREAR UNA NUEVA ATRACCION
          */
@@ -261,6 +271,343 @@ public class InterfazAdmin {
 	    guardarAtracciones();
 	}
 	
+	public void crearAtraccionDesdeSwing(String tipo, String nombre, String cupoStr, String empleadosStr,
+            String climaStr, String nivelExclusividad,
+            String... extras) {
+		try {
+			// Validar campos comunes
+			int cupoMaximo = Integer.parseInt(cupoStr.trim());
+			int empleadosEncargados = Integer.parseInt(empleadosStr.trim());
+			boolean disponibleClima = Boolean.parseBoolean(climaStr.trim());
+
+			// Verificar que no exista una atracción con ese nombre
+			for (Atraccion a : atracciones) {
+			if (a.getNombre().equalsIgnoreCase(nombre)) {
+			JOptionPane.showMessageDialog(null,
+			"Ya existe una atracción registrada con ese nombre.",
+			"Error", JOptionPane.ERROR_MESSAGE);
+			return;
+			}
+			}
+			Atraccion nuevaAtraccion;
+
+			if (tipo.equalsIgnoreCase("Mecanica")) {
+			if (extras.length < 6) {
+			JOptionPane.showMessageDialog(null,
+			"Faltan datos para atracción mecánica.",
+			"Error", JOptionPane.ERROR_MESSAGE);
+			return;
+			}
+			int minAltura = Integer.parseInt(extras[0].trim());
+			int maxAltura = Integer.parseInt(extras[1].trim());
+			int minPeso = Integer.parseInt(extras[2].trim());
+			int maxPeso = Integer.parseInt(extras[3].trim());
+			String restriccionesSalud = extras[4].trim();
+			String nivelRiesgo = extras[5].trim();
+
+			nuevaAtraccion = new AtraccionMecanica(
+			nombre, cupoMaximo, empleadosEncargados, disponibleClima,
+			nivelExclusividad, minAltura, maxAltura,
+			minPeso, maxPeso, restriccionesSalud, nivelRiesgo
+			);
+			} else {
+			if (extras.length < 1) {
+			JOptionPane.showMessageDialog(null,
+			"Falta la edad mínima para atracción cultural.",
+			"Error", JOptionPane.ERROR_MESSAGE);
+			return;
+			}
+			int edadMinima = Integer.parseInt(extras[0].trim());
+
+			nuevaAtraccion = new AtraccionCultural(
+			nombre, cupoMaximo, empleadosEncargados,
+			disponibleClima, nivelExclusividad, edadMinima
+			);
+			}
+
+			atracciones.add(nuevaAtraccion);
+			guardarAtracciones();
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(null,
+			"Error en los datos numéricos: " + e.getMessage(),
+			"Error", JOptionPane.ERROR_MESSAGE);
+			} catch (Exception e) {
+			JOptionPane.showMessageDialog(null,
+			"Error inesperado: " + e.getMessage(),
+			"Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	
+	public void modificarAtraccionDesdeSwing(String nombreModificar) {
+	    archivoPlano = new ArchivoPlano();
+	    ArrayList<String> atraccionesActuales = archivoPlano.leer("datos/atracciones.csv");
+
+	    boolean encontrada = false;
+	    ArrayList<String> atraccionesModificadas = new ArrayList<>();
+
+	    for (String linea : atraccionesActuales) {
+	        String[] partes = linea.split(",");
+
+	        if (partes.length >= 6 && partes[1].equalsIgnoreCase(nombreModificar)) {
+	            encontrada = true;
+
+	            // Mostrar información actual en consola de respaldo
+	            System.out.println("Modificando atraccion: " + linea);
+
+	            String tipo = partes[0];
+	            String cupoMaximo = JOptionPane.showInputDialog(null, "Nuevo cupo máximo:", partes[2]);
+	            String empleadosEncargados = JOptionPane.showInputDialog(null, "Cantidad de empleados:", partes[3]);
+	            String disponibleClima = JOptionPane.showInputDialog(null, "¿Disponible en clima adverso? (true/false):", partes[4]);
+	            String nivelExclusividad = JOptionPane.showInputDialog(null, "Nivel de exclusividad:", partes[5]);
+
+	            if (tipo.equalsIgnoreCase("Mecanica") && partes.length >= 12) {
+	                String minAltura = JOptionPane.showInputDialog(null, "Altura mínima (cm):", partes[6]);
+	                String maxAltura = JOptionPane.showInputDialog(null, "Altura máxima (cm):", partes[7]);
+	                String minPeso = JOptionPane.showInputDialog(null, "Peso mínimo (kg):", partes[8]);
+	                String maxPeso = JOptionPane.showInputDialog(null, "Peso máximo (kg):", partes[9]);
+	                String salud = JOptionPane.showInputDialog(null, "Restricciones de salud:", partes[10]);
+	                String riesgo = JOptionPane.showInputDialog(null, "Nivel de riesgo:", partes[11]);
+
+	                String nuevaLinea = String.join(",", tipo, nombreModificar, cupoMaximo, empleadosEncargados,
+	                        disponibleClima, nivelExclusividad, minAltura, maxAltura, minPeso, maxPeso, salud, riesgo);
+
+	                atraccionesModificadas.add(nuevaLinea);
+	            } else if (tipo.equalsIgnoreCase("Cultural") && partes.length >= 7) {
+	                String edadMinima = JOptionPane.showInputDialog(null, "Edad mínima requerida:", partes[6]);
+
+	                String nuevaLinea = String.join(",", tipo, nombreModificar, cupoMaximo, empleadosEncargados,
+	                        disponibleClima, nivelExclusividad, edadMinima);
+
+	                atraccionesModificadas.add(nuevaLinea);
+	            } else {
+	                JOptionPane.showMessageDialog(null, "Formato desconocido para esta atracción.");
+	                return;
+	            }
+
+	        } else {
+	            atraccionesModificadas.add(linea);
+	        }
+	    }
+
+	    if (encontrada) {
+	        archivoPlano.escribir("datos/atracciones.csv", atraccionesModificadas);
+	        JOptionPane.showMessageDialog(null, "Atracción modificada exitosamente.");
+	    } else {
+	        JOptionPane.showMessageDialog(null, "No se encontró ninguna atracción con ese nombre.");
+	    }
+	}
+	
+	public void eliminarAtraccionDesdeSwing(String nombreAEliminar) {
+	    archivoPlano = new ArchivoPlano();
+	    ArrayList<String> atraccionesActuales = archivoPlano.leer("datos/atracciones.csv");
+
+	    boolean encontrada = false;
+	    ArrayList<String> atraccionesActualizadas = new ArrayList<>();
+
+	    for (String linea : atraccionesActuales) {
+	        String[] partes = linea.split(",");
+	        if (partes.length >= 2 && partes[1].equalsIgnoreCase(nombreAEliminar)) {
+	            encontrada = true;
+	        } else {
+	            atraccionesActualizadas.add(linea);
+	        }
+	    }
+
+	    if (encontrada) {
+	        archivoPlano.escribir("datos/atracciones.csv", atraccionesActualizadas);
+	        JOptionPane.showMessageDialog(null, "Atracción eliminada exitosamente: " + nombreAEliminar);
+	    } else {
+	        JOptionPane.showMessageDialog(null, "No se encontró una atracción con ese nombre.");
+	    }
+	}
+	
+	public void crearTurnoDesdeSwing() {
+	    try {
+	        String tipo = JOptionPane.showInputDialog(null, "Tipo de turno (Diurno o Nocturno):");
+	        if (tipo == null || tipo.trim().isEmpty()) return;
+
+	        String inicioStr = JOptionPane.showInputDialog(null, "Fecha y hora de inicio (yyyy-MM-dd HH:mm):");
+	        if (inicioStr == null || inicioStr.trim().isEmpty()) return;
+
+	        String finStr = JOptionPane.showInputDialog(null, "Fecha y hora de fin (yyyy-MM-dd HH:mm):");
+	        if (finStr == null || finStr.trim().isEmpty()) return;
+
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+	        LocalDateTime inicio = LocalDateTime.parse(inicioStr.trim(), formatter);
+	        LocalDateTime fin = LocalDateTime.parse(finStr.trim(), formatter);
+
+	        Turno nuevoTurno = new Turno(tipo.trim(), inicio, fin);
+	        turnosDisponibles.add(nuevoTurno);
+
+	        JOptionPane.showMessageDialog(null, "Turno creado exitosamente:\n" + nuevoTurno.toString());
+
+	    } catch (Exception e) {
+	        JOptionPane.showMessageDialog(null,
+	                "Error al crear el turno. Asegúrese de ingresar los datos en el formato correcto.",
+	                "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	
+	public void asignarTurnoDesdeSwing() {
+	    archivoPlano = new ArchivoPlano();
+	    ArrayList<String> empleadosActuales = archivoPlano.leer("datos/empleados.csv");
+
+	    if (empleadosActuales.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "No hay empleados registrados.");
+	        return;
+	    }
+
+	    // Mostrar empleados
+	    String[] opcionesEmpleados = new String[empleadosActuales.size()];
+	    for (int i = 0; i < empleadosActuales.size(); i++) {
+	        String[] partes = empleadosActuales.get(i).split(",");
+	        opcionesEmpleados[i] = partes.length >= 4 ? partes[3] + " (ID: " + partes[4] + ")" : "Empleado " + (i + 1);
+	    }
+
+	    String seleccionadoEmpleado = (String) JOptionPane.showInputDialog(null,
+	            "Seleccione el empleado:",
+	            "Asignar Turno",
+	            JOptionPane.QUESTION_MESSAGE,
+	            null,
+	            opcionesEmpleados,
+	            opcionesEmpleados[0]);
+
+	    if (seleccionadoEmpleado == null) return;
+
+	    if (turnosDisponibles.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "No hay turnos disponibles. Cree uno primero.");
+	        return;
+	    }
+
+	    // Mostrar turnos disponibles
+	    String[] opcionesTurnos = new String[turnosDisponibles.size()];
+	    for (int i = 0; i < turnosDisponibles.size(); i++) {
+	        opcionesTurnos[i] = turnosDisponibles.get(i).toString();
+	    }
+
+	    String seleccionadoTurno = (String) JOptionPane.showInputDialog(null,
+	            "Seleccione el turno a asignar:",
+	            "Asignar Turno",
+	            JOptionPane.QUESTION_MESSAGE,
+	            null,
+	            opcionesTurnos,
+	            opcionesTurnos[0]);
+
+	    if (seleccionadoTurno == null) return;
+
+	    // Buscar índices seleccionados
+	    int indexEmpleado = -1, indexTurno = -1;
+	    for (int i = 0; i < empleadosActuales.size(); i++) {
+	        if (opcionesEmpleados[i].equals(seleccionadoEmpleado)) {
+	            indexEmpleado = i;
+	            break;
+	        }
+	    }
+
+	    for (int i = 0; i < turnosDisponibles.size(); i++) {
+	        if (turnosDisponibles.get(i).toString().equals(seleccionadoTurno)) {
+	            indexTurno = i;
+	            break;
+	        }
+	    }
+
+	    if (indexEmpleado == -1 || indexTurno == -1) {
+	        JOptionPane.showMessageDialog(null, "No se pudo asignar el turno.");
+	        return;
+	    }
+
+	    // Actualizar archivo CSV
+	    String lineaOriginal = empleadosActuales.get(indexEmpleado);
+	    String[] partes = lineaOriginal.split(",");
+	    if (partes.length < 7) {
+	        JOptionPane.showMessageDialog(null, "Error al procesar el empleado.");
+	        return;
+	    }
+
+	    partes[6] = turnosDisponibles.get(indexTurno).toString();
+	    empleadosActuales.set(indexEmpleado, String.join(",", partes));
+	    archivoPlano.escribir("datos/empleados.csv", empleadosActuales);
+
+	    JOptionPane.showMessageDialog(null, "Turno asignado exitosamente a " + partes[3]);
+	}
+	
+	public void registrarEmpleadoDesdeSwing() {
+	    try {
+	        String nombre = JOptionPane.showInputDialog(null, "Nombre del empleado:");
+	        if (nombre == null || nombre.trim().isEmpty()) return;
+
+	        String login = JOptionPane.showInputDialog(null, "Login del empleado:");
+	        if (login == null || login.trim().isEmpty()) return;
+
+	        String password = JOptionPane.showInputDialog(null, "Contraseña:");
+	        if (password == null || password.trim().isEmpty()) return;
+
+	        String[] tipos = {"Cajero", "Cocinero", "Operador Mecanico", "Servicio General"};
+	        String tipoSeleccionado = (String) JOptionPane.showInputDialog(null,
+	                "Seleccione el tipo de empleado:",
+	                "Tipo de Empleado",
+	                JOptionPane.QUESTION_MESSAGE,
+	                null,
+	                tipos,
+	                tipos[0]);
+
+	        if (tipoSeleccionado == null) return;
+
+	        // Validar turno disponible
+	        if (turnosDisponibles.isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "No hay turnos disponibles. Cree uno primero.");
+	            return;
+	        }
+
+	        // Selección de turno
+	        String[] opcionesTurnos = new String[turnosDisponibles.size()];
+	        for (int i = 0; i < turnosDisponibles.size(); i++) {
+	            opcionesTurnos[i] = turnosDisponibles.get(i).toString();
+	        }
+
+	        String seleccionadoTurno = (String) JOptionPane.showInputDialog(null,
+	                "Seleccione un turno para el empleado:",
+	                "Turno",
+	                JOptionPane.QUESTION_MESSAGE,
+	                null,
+	                opcionesTurnos,
+	                opcionesTurnos[0]);
+
+	        if (seleccionadoTurno == null) return;
+
+	        Turno turnoSeleccionado = null;
+	        for (Turno t : turnosDisponibles) {
+	            if (t.toString().equals(seleccionadoTurno)) {
+	                turnoSeleccionado = t;
+	                break;
+	            }
+	        }
+
+	        Empleado nuevo = switch (tipoSeleccionado) {
+	            case "Cajero" -> new Cajero(login, password, nombre, 1, "Taquilla", turnoSeleccionado, true);
+	            case "Cocinero" -> new Cocinero(login, password, nombre, 1, "Cocina", turnoSeleccionado, true);
+	            case "Operador Mecanico" -> new OperadorMecanico(login, password, nombre, 1, "MontanaRusa", true, atraccionMecanica, turnoSeleccionado);
+	            case "Servicio General" -> new ServicioGeneral(login, password, nombre, 1, "Baños", turnoSeleccionado);
+	            default -> null;
+	        };
+
+	        if (nuevo == null) {
+	            JOptionPane.showMessageDialog(null, "Tipo de empleado no reconocido.");
+	            return;
+	        }
+
+	        nuevo.asignarTurno(turnoSeleccionado.getHoraInicio().toLocalDate(), turnoSeleccionado);
+	        nuevo.setTurno(turnoSeleccionado);
+	        empleados.add(nuevo);
+	        archivoPlano = new ArchivoPlano();
+	        archivoPlano.escribirEmpleadoAppend("datos/empleados.csv", nuevo);
+
+	        JOptionPane.showMessageDialog(null, "Empleado registrado exitosamente.");
+	    } catch (Exception e) {
+	        JOptionPane.showMessageDialog(null, "Error al registrar empleado: " + e.getMessage());
+	    }
+	}
+
 	/**
      * FUNCION PARA GUARDAR LOS CAMBIOS HECHOS EN EL ARCHIVO
      */
@@ -296,7 +643,7 @@ public class InterfazAdmin {
 	/**
      * FUNCION PARA MODIFICAR LA INFORMACION DE UNA ATRACCION EN ESPECIFICO
      */
-	private void modificarAtraccion() {
+	public void modificarAtraccion() {
 		System.out.println("== Modificar atraccion ==");
 
 		archivoPlano = new ArchivoPlano();
@@ -403,7 +750,7 @@ public class InterfazAdmin {
 	/**
      * FUNCION PARA ELIMINAR UNA ATRACCION EN ESPECIFICO
      */
-	private void eliminarAtraccion() {
+	public void eliminarAtraccion() {
 	    System.out.println("== Eliminar atraccion ==");
 
 	    System.out.print("Ingrese el nombre de la atraccion que desea eliminar: ");
@@ -434,7 +781,7 @@ public class InterfazAdmin {
 	/**
      * FUNCION QUE PERMITE CREAR UN TURNO
      */
-	private void crearTurno() {
+	public void crearTurno() {
 	    System.out.println("\n== Crear nuevo turno ==");
 
 	    System.out.print("Ingrese el tipo de turno (Diurno o Nocturno): ");
@@ -470,7 +817,7 @@ public class InterfazAdmin {
 	/**
      * FUNCION QUE PERMITE ASIGNAR UN TURNO A UN EMPLEADO DADO
      */
-	private void AsignarNuevoTurno() {
+	public void AsignarNuevoTurno() {
 	    System.out.println("\n== Asignar nuevo turno a un empleado ==");
 	    
 	    // Leemos y mostramos los empleados actuales
@@ -533,7 +880,7 @@ public class InterfazAdmin {
 	/**
      * FUNCION QUE PERMITE CREAR UN NUEVO EMPLEADO
      */
-	private void CrearEmpleado() {
+	public void CrearEmpleado() {
 	    // Registro manual de empleado
 	    System.out.println("\n== Registro de nuevo empleado ==");
 
