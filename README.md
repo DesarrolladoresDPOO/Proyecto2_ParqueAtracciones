@@ -1,4 +1,4 @@
-# Proyecto 2 - Sistema de Administración Parque de Atracciones
+# Proyecto 3 - Sistema de Administración Parque de Atracciones
 
 ## Integrantes  
 1. **Jerónimo López** - 202320969  
@@ -7,8 +7,8 @@
 
 Diseño y Programación Orientada a Objetos (DPOO)  
 
+> **Nota:** Para ejecutar la aplicación con interfaz gráfica, inicie la clase `vista/VentanaPrincipal.java`. No ejecute directamente las clases de consola (`AdminMain`, `EmpleadoMain` o `ClienteMain`) para evitar confusiones.
 ---
-
 ## Descripción General
 
 Este proyecto implementa un sistema de gestión para un parque de atracciones, desarrollado en Java con un enfoque de programación orientada a objetos. Permite la administración de atracciones, empleados, turnos y la venta de tiquetes a través de interfaces de consola diferenciadas por rol: administrador, empleado y cliente.
@@ -16,25 +16,82 @@ Este proyecto implementa un sistema de gestión para un parque de atracciones, d
 El sistema asegura la persistencia de datos mediante archivos CSV, cuenta con autenticación de usuarios, validación de entradas y pruebas automatizadas con JUnit.
 
 # Estructura del Proyecto
+
 ```bash
 Proyecto2_ParqueAtracciones/
 ├── src/
-│   ├── Interfaz/             # Interfaces de consola por rol
-│   ├── persona/              # Clases relacionadas con empleados y usuarios
+│   ├── Interfaz/             # Clases de arranque por consola (legado)
+│   │   ├── AdminMain.java    
+│   │   ├── EmpleadoMain.java 
+│   │   ├── ClienteMain.java  
+│   │   ├── InterfazAdmin.java
+│   │   ├── InterfazEmpleado.java
+│   │   └── InterfazCliente.java
+│   │
+│   ├── persona/              # Clases de usuario, roles y objetos de dominio
+│   │   ├── Usuario.java      
+│   │   ├── Cliente.java      
+│   │   ├── Empleado.java     
+│   │   ├── Cajero.java       
+│   │   ├── Cocinero.java     
+│   │   ├── OperadorMecanico.java
+│   │   ├── ServicioGeneral.java
+│   │   ├── Administrador.java
+│   │   ├── Turno.java        
+│   │   └── LugarTrabajo.java 
+│   │
 │   ├── atracciones/          # Modelado de atracciones y espectáculos
-│   ├── tiquetes/             # Gestión de diferentes tipos de tiquetes
+│   │   ├── Atraccion.java    
+│   │   ├── AtraccionMecanica.java
+│   │   ├── AtraccionCultural.java
+│   │   ├── Espectaculo.java  
+│   │   ├── Ubicacion.java    
+│   │   └── Temporada.java    
+│   │
+│   ├── tiquetes/             # Gestión de diferentes tipos de tiquetes y ventas
+│   │   ├── Tiquete.java      
+│   │   ├── TiqueteBasico.java
+│   │   ├── TiqueteFamiliar.java
+│   │   ├── TiqueteOro.java   
+│   │   ├── TiqueteDiamante.java
+│   │   ├── TiqueteTemporada.java
+│   │   ├── EntradaIndividual.java
+│   │   ├── VentaOnline.java  
+│   │   └── Taquilla.java     
+│   │
 │   ├── persistencia/         # Lectura y escritura de archivos CSV
-│   └── pruebas/              # Pruebas unitarias e integración con JUnit
+│   │   └── ArchivoPlano.java 
+│   │
+│   ├── vista/                # Interfaces gráficas Swing (nueva capa GUI)
+│   │   ├── VentanaPrincipal.java
+│   │   ├── VentanaAdmin.java
+│   │   ├── VentanaAsistenciaEmpleado.java
+│   │   └── VentanaCliente.java
+│   │
+│   └── pruebas/              # Pruebas unitarias e integración (JUnit 5)
+│       ├── TestAtraccionCultural.java
+│       ├── TestAtraccionMecanica.java
+│       ├── TestCliente.java
+│       ├── TestEspectaculo.java
+│       ├── TestTaquilla.java
+│       ├── TestVentaOnline.java
+│       ├── TestArchivoPlano.java
+│       ├── TestVentanaAdmin.java       # Pruebas básicas de GUI
+│       ├── TestVentanaAsistenciaEmpleado.java
+│       └── TestVentanaCliente.java
 │
-├── datos/
-│   ├── empleados.csv
-│   ├── clientes.csv
-│   ├── atracciones.csv
-│   ├── asistencias_clientes.csv
-│   └── auth_admin.csv
+├── datos/                     # Archivos CSV de persistencia
+│   ├── auth_admin.csv         # Credenciales de administradores
+│   ├── clientes.csv           # Datos de clientes (login, contraseña, nombre, tiquetes)
+│   ├── empleados.csv          # Datos de empleados (rol, login, contraseña, turnos)
+│   ├── atracciones.csv        # Registro de atracciones mecánicas y culturales
+│   ├── tiquetes.csv           # Tiquetes generados (ID, cliente, tipo, estado, fechas)
+│   ├── ventas_taquilla.csv    # Histórico de ventas en taquilla física
+│   ├── ventas_online.csv      # Histórico de ventas en línea
+│   └── asistencias_clientes.csv # Historial de asistencias marcadas por empleados
 │
-├── README.md
-└── Documento_de_Analisis_proyecto_2.pdf
+├── README.md                  # Este archivo
+└── Documento_de_Analisis_proyecto_2.pdf  # Documento de análisis y diseño
 ```
 
 ## Funcionalidades Clave
