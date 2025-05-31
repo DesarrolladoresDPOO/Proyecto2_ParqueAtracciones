@@ -3,6 +3,6 @@ package Interfaz;
 public class AdminMain {
     public static void main(String[] args) {
         InterfazAdmin interfaz = new InterfazAdmin();
-        interfaz.autenticarYIniciar();
+        new vista.VentanaAdmin(interfaz);
     }
 }
